@@ -57,14 +57,19 @@ async function runEngine(args = []) {
 
     const output = error.stdout?.toString?.().trim();
     if (output) {
+      let parsed;
+
       try {
-        const parsed = JSON.parse(output);
-        const engineError = new Error(parsed.error || "C++ engine command failed.");
-        engineError.status = 400;
-        throw engineError;
+        parsed = JSON.parse(output);
       } catch {
-        // fall through to the original process error
+        throw error;
       }
+
+      const engineError = new Error(
+        parsed.error || "C++ engine command failed."
+      );
+      engineError.status = 400;
+      throw engineError;
     }
     throw error;
   }
